@@ -10,12 +10,26 @@ import {Component } from '@angular/core'
 export class extauthorizeComponent {
     constructor() {
         //get id token from urls part 
-        var x =  location.hash;
-        var extToken = x.replace("#token_type=Bearer&access_token=", "");
+        var frank_param = this.getParam( 'code' );
+     /*   var x =  location.hash;
+        alert(x);
+        var extToken = x.replace("#code=", "");*/
         //save into localstorage
-       localStorage.setItem("auth_key", extToken);
+       localStorage.setItem("code", frank_param);
     }
-   
+ getParam( name )
+{
+ name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+ var regexS = "[\\?&]"+name+"=([^&#]*)";
+ var regex = new RegExp( regexS );
+ var results = regex.exec( window.location.href );
+ if( results == null )
+  return "";
+else
+ return results[1];
+}
+
+
    
    
 

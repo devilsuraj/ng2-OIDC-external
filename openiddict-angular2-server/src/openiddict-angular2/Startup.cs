@@ -49,9 +49,11 @@ namespace openiddict_angular2
                     o.Password.RequireNonAlphanumeric = false;
                     o.Password.RequiredLength = 6;
                     o.Cookies.ApplicationCookie.AutomaticChallenge = false;
+                    
 
                 })
                  .AddEntityFrameworkStores<ApplicationDbContext>()
+                 
                  //.AddTokenProvider()
                  .AddDefaultTokenProviders();
                 services.AddOpenIddict<ApplicationUser, IdentityRole, ApplicationDbContext>()
@@ -60,13 +62,14 @@ namespace openiddict_angular2
                 .EnableLogoutEndpoint("/connect/logout")
                 .EnableTokenEndpoint("/connect/token")
                 .EnableUserinfoEndpoint("/connect/userinfo")
-
+                
+                    // .AllowImplicitFlow()
                 // Note: the Mvc.Client sample only uses the authorization code flow but you can enable
                 // the other flows if you need to support implicit, password or client credentials.
-                .AllowAuthorizationCodeFlow()
+                  .AllowAuthorizationCodeFlow()
                 .AllowRefreshTokenFlow()
                 .AllowPasswordFlow()
-                .AllowImplicitFlow()
+           
 
                     // During development, you can disable the HTTPS requirement.
                     .DisableHttpsRequirement();

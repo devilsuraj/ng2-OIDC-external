@@ -1,6 +1,5 @@
 ﻿import {Injectable}     from '@angular/core';
 import {Http, Response, Headers, RequestOptions} from '@angular/http';
-import {logModel, registerModel, extprovider,token,Regresult} from './authorize-component'
 import {Configuration} from '../app.constants'
 import {Observable} from 'rxjs/Rx';
 import 'rxjs/add/operator/map';
@@ -20,6 +19,11 @@ export class authervice {
                           "&resource="+ this.app.FileServer + // audience url . read more on docs /blog
                           "&responseType=token" + // get token 
                           "&scope=offline_access profile email roles"; // offline_access for refresh_token read more on docs / blog
+
+ private authCodeParams = "grant_type=authorization_code" +
+                          "&client_id=localApp" +// password type reuqets with credentials read more on grant_types
+                          "&redirect_uri=http://localhost:3000/signin-oidc" + // audience url . read more on docs /blog
+                          "&responseType=token"; // get token 
 
     private refreshParams;
                            
@@ -44,8 +48,13 @@ export class authervice {
         }
     }
 
-    Login(inputType: logModel): Observable<token> {
-        return this.http.post(this._authUrl + "/connect/token" , this.tokenParams + "&username=" + inputType.username + "&password=" + inputType.password, this.options)
+    
+
+      getAuthorized(inputType: string): Observable<token> {
+           this.authheaders = new Headers({'Content-Type': 'application/x-www-form-urlencoded' });
+              this.Authoptions = new RequestOptions({ headers: this.authheaders });
+        return this.http.post(this._authUrl + "/connect/token" , 
+        this.authCodeParams + "&code=" + inputType, this.Authoptions)
             .map(res => <token>res.json())
             .catch(this.handleError)
     }
@@ -61,13 +70,7 @@ export class authervice {
             .catch(this.handleError)
     }
 
-    Register(inputType: registerModel): Observable<Regresult> {
-        let body = JSON.stringify(inputType);
-        return this.http.post(this._authUrl + "/api/account/register", body, this.joptions)
-            .map(res => <Regresult>res.json())
-            .catch(this.handleError)
-    }
-   
+  
     private handleError(error: Response) {
         return Observable.throw(error || 'Server error');
     }

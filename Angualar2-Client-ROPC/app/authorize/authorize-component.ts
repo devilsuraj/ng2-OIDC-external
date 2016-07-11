@@ -39,8 +39,6 @@ export class authorizeComponent{
     public detoken: any = "";
     public isLoggedin: boolean;
     public logMsg: string;
-    public model: logModel;
-    public rmodel: registerModel;
     public pros: extprovider;
     public login: boolean;
     public register: boolean;
@@ -71,8 +69,7 @@ export class authorizeComponent{
 
         } // logic to redirect user if already logged in
        // this.isLoggedin = false;
-        this.model = new logModel();
-        this.rmodel = new registerModel();
+   
         this.pros = new extprovider();
         // below logic is for my login form snippet  to view login/register/loss password etc
         this.logMsg = "Type your credentials.";
@@ -87,42 +84,7 @@ export class authorizeComponent{
         this.register = false;
         this.loss = false;
     }
-    public callLoss() {
-        this.login = false;
-        this.register = false;
-        this.loss = true;
-    }
-    public callRegister() {
-        this.login = false;
-        this.register = true;
-        this.loss = false;
-    }
-    // end
-
-
-    public Login(creds: logModel) {
-        var instance = this;
-        this.authentication.Login(creds)
-            .subscribe(
-            Ttoken => {
-                this.logMsg = "You are logged In Now , Please Wait ....";
-                localStorage.setItem("auth_key", Ttoken.access_token);
-                localStorage.setItem("refresh_key", Ttoken.refresh_token);
-                this.isLoggedin = true;
-                instance.getUserFromServer();
-                this.mclose();
-                this._parentRouter.navigate(['/dashboard']);
-            },
-            Error => {
-                var error, key;
-                key = Error.json();
-                for (error in key) {
-                    this.logMsg = "";
-                    this.logMsg = this.logMsg + key[error] + "\n";
-                }
-            })
-        
-    }
+   
 
     public refreshLogin() {
     var instance = this;
@@ -159,15 +121,21 @@ export class authorizeComponent{
     //open a popup for external login and set a interval function [API in Account Controller]
     public extLogin(provider: string) {
         var instance = this;
-        var popup_window = window.open('http://localhost:52606/api/account/externalaccess?provider=' + provider + '&returnUrl=http://localhost:52606/connect/authorize?client_id=localApp%26redirect_uri=http://localhost:3000/signin-oidc%26response_type=id_token%20token%26scope=openid%20offline_access%20profile%20email%20roles%26nonce=123456%26client_id=firebaseApp%26resource=http://localhost:3000', '_blank', 'width=500, height=400');
+        var popup_window = window.open('http://localhost:52606/api/account/externalaccess?provider=' + provider + '&returnUrl=http://localhost:52606/connect/authorize?client_id=localApp%26response_type=code%26scope=offline_access%26nonce=12345%26resource=http://localhost:3000%26redirect_uri=http://localhost:3000/signin-oidc', '_blank', 'width=500, height=400');
         var intervalId=  setInterval(function () {
-            if (localStorage.getItem('auth_key')) {
+            if (localStorage.getItem('code')) {
+                instance.authentication.getAuthorized(localStorage.getItem('code')).subscribe(data=>{
+                localStorage.removeItem('code');
+                localStorage.setItem("auth_key", data.access_token);
+                localStorage.setItem("refresh_key", data.refresh_token);
                 popup_window.close();//close external login popup
                 instance.mclose();
                 instance.getUserFromServer();
                 instance.isLoggedin = true;// close login box
                 instance._parentRouter.navigate(['/dashboard']);
                 clearInterval(intervalId);// navigate to dashboard, we can use returnurls too
+},error=>{});
+               
             } }, 3000); //Check if the user has finished external login process after each 3 seconds.
     }
 
@@ -181,55 +149,16 @@ export class authorizeComponent{
         }, error => { this.logMsg = error });
     }
 
-    public userRegister(creds:registerModel) {
-        this.authentication.Register(creds)
-            .subscribe(
-            Ttoken => {
-                if (Ttoken.succeeded) {
-                    this.model.username = creds.Email;
-                    this.model.password = creds.Password;
-                    this.Login(this.model);
-                }
-                else
-                {
-                    this.logMsg = Ttoken.errors[0].description
-                }
-            },
-            Error => {
-                var error, key;
-                key = Error.json();
-                for (error in key) {
-                    this.logMsg = "";
-                    this.logMsg = this.logMsg + key[error] + "\n";
-                }
-            });
-    }
-    }
-
-
-export class logModel {
-    public username: string;
-    public password: string;
 }
-
 export class extprovider {
     public provider: string;
     public returnUrl: string;
 }
 
-export class registerModel {
-    public Email: string;
-    public Password: string;
-    public ConfirmPassword: string;
-}
+
 export class token {
     public access_token: string;
     public expires_in: string;
     public refresh_token: string;
     public token_type: string;
-}
-export class Regresult {
-    public succeeded: string;
-    public errors: any[];
-   
 }
