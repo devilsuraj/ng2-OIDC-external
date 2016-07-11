@@ -159,7 +159,7 @@ export class authorizeComponent{
     //open a popup for external login and set a interval function [API in Account Controller]
     public extLogin(provider: string) {
         var instance = this;
-        var popup_window = window.open('http://localhost:52606/api/account/externalaccess?provider=' + provider + '&returnUrl=http://localhost:52606/connect/authorize?client_id=localApp%26redirect_uri=http://localhost:3000/signin-oidc%26response_type=id_token%20token%26scope=openid%20offline_access%20profile%20email%20roles%26nonce=123456%26client_id=firebaseApp%26resource=http://localhost:58056', '_blank', 'width=500, height=400');
+        var popup_window = window.open('http://localhost:52606/api/account/externalaccess?provider=' + provider + '&returnUrl=http://localhost:52606/connect/authorize?client_id=localApp%26redirect_uri=http://localhost:3000/signin-oidc%26response_type=id_token%20token%26scope=openid%20offline_access%20profile%20email%20roles%26nonce=123456%26client_id=firebaseApp%26resource=http://localhost:3000', '_blank', 'width=500, height=400');
         var intervalId=  setInterval(function () {
             if (localStorage.getItem('auth_key')) {
                 popup_window.close();//close external login popup

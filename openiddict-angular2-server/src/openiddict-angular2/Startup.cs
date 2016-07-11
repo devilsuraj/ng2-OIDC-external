@@ -125,7 +125,7 @@ namespace openiddict_angular2
                     AutomaticAuthenticate = true,
                     AutomaticChallenge = true,
                     RequireHttpsMetadata = false,
-                    Audience = "http://localhost:52606",
+                    Audience = "http://localhost:3000",
                     Authority = "http://localhost:52606"
                 });
                 app.UseOpenIddict();

@@ -17,7 +17,7 @@ export class authervice {
     private Authoptions;// = new RequestOptions({ headers: this.authheaders });
     private tokenParams = "grant_type=password" +
                           "&client_id=localApp" +// password type reuqets with credentials read more on grant_types
-                          "&resource="+ this.app.Server + // audience url . read more on docs /blog
+                          "&resource="+ this.app.FileServer + // audience url . read more on docs /blog
                           "&responseType=token" + // get token 
                           "&scope=offline_access profile email roles"; // offline_access for refresh_token read more on docs / blog
 
@@ -54,7 +54,7 @@ export class authervice {
         this.refreshParams == "grant_type=refresh_token" +
             "&client_id=localApp" +// password type reuqets with credentials read more on grant_types
                          // refresh tokens when access_tokens are expired simply renew em!
-            "&resource=" + this.app.Server  +
+            "&resource=" + this.app.FileServer  +
             "&refresh_token=" + localStorage.getItem("refresh_key"); // get refresh token stored when logged in 
         return this.http.post(this._authUrl + "/connect/token", this.refreshParams, this.options)
             .map(res => <token>res.json())
